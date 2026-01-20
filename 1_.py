@@ -169,7 +169,7 @@ class DoodleJump(arcade.Window):
             high_of_jump = (JUMP_SPEED / GRAVITY) * JUMP_SPEED / 2
             y = highest_platform.center_y + min((high_of_jump,self.score / 10 + 60))
             rr = random.random()
-            if rr < self.score / 1000:
+            if rr < self.score / 1700:
                 platform = Platform_Disappearance(x, y)
             elif rr < 0.5:
                 platform = PlatformJump(x, y)
@@ -210,3 +210,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
