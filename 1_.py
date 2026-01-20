@@ -8,7 +8,7 @@ SCREEN_TITLE = "Doodle Jump"
 PLAYER_SPEED = 5
 GRAVITY = 0.5
 JUMP_SPEED = 15
-SUPER_JUMP_SPEED = 50
+SUPER_JUMP_SPEED = 30
 
 
 class Player(arcade.Sprite):
@@ -80,7 +80,7 @@ class PlatformJump(Platform):
         self.height = 10
         self.color = arcade.color.BLUE
 
-    def brake_down(self):
+    def break_down(self):
         return SUPER_JUMP_SPEED
 
 
@@ -169,10 +169,10 @@ class DoodleJump(arcade.Window):
             high_of_jump = (JUMP_SPEED / GRAVITY) * JUMP_SPEED / 2
             y = highest_platform.center_y + min((high_of_jump,self.score / 10 + 60))
             rr = random.random()
-            if rr < self.score / 1700:
-                platform = Platform_Disappearance(x, y)
-            elif rr < 0.5:
+            if rr < 0.1:
                 platform = PlatformJump(x, y)
+            elif rr < self.score / 2000:
+                platform = Platform_Disappearance(x, y)
             else:
                 platform = Platform(x, y)
             self.platforms.append(platform)
@@ -210,4 +210,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
