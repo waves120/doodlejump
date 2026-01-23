@@ -48,13 +48,20 @@ class Platform(arcade.Sprite):
     def draw(self):
         arcade.draw_rectangle_filled(self.center_x, self.center_y, self.width, self.height, self.color)
 
-    def break_down(self):
-        return JUMP_SPEED
+    def break_down(self, fall):
+        if fall < 0:
+            return JUMP_SPEED
+        else:
+            return fall
 
-class Platform_Disappearance(Platform):
+    def update(self, _):
+        pass
+
+
+class PlatformDisappearance(Platform):
 
     def __init__(self, x, y, width=80):
-        super().__init__( x, y, width=80)
+        super().__init__(x, y, width=80)
         self.center_x = x
         self.center_y = y
         self.width = width
@@ -64,25 +71,82 @@ class Platform_Disappearance(Platform):
     def draw(self):
         arcade.draw_rectangle_filled(self.center_x, self.center_y, self.width, self.height, self.color)
 
-    def break_down(self):
+    def break_down(self, fall):
         self.remove_from_sprite_lists()
         self.kill()
-        return JUMP_SPEED
+        if fall < 0:
+            return JUMP_SPEED
+        else:
+            return fall
+
+    def update(self, _):
+        pass
 
 
 class PlatformJump(Platform):
 
     def __init__(self, x, y, width=80):
-        super().__init__( x, y, width=80)
+        super().__init__(x, y, width=80)
         self.center_x = x
         self.center_y = y
         self.width = width
         self.height = 10
         self.color = arcade.color.BLUE
 
-    def break_down(self):
-        return SUPER_JUMP_SPEED
+    def break_down(self, fall):
+        if fall < 0:
+            return SUPER_JUMP_SPEED
+        else:
+            return fall
 
+    def update(self, _):
+        pass
+
+
+class PlatformMove(Platform):
+
+    def __init__(self, x, y, width=80):
+        super().__init__(x, y, width=80)
+        self.center_x = x
+        self.center_y = y
+        self.width = width
+        self.height = 10
+        self.color = arcade.color.WHITE
+        self.speed = 2.5
+
+    def break_down(self, fall):
+        if fall < 0:
+            return JUMP_SPEED
+        else:
+            return fall
+
+    def update(self, _):
+        self.center_x += self.speed
+
+        if self.left < 0:
+            self.speed = abs(self.speed)
+        elif self.right > SCREEN_WIDTH:
+            self.speed = -abs(self.speed)
+
+
+class PlatformDied(Platform):
+
+    def __init__(self, x, y, width=80):
+        super().__init__(x, y, width=80)
+        self.center_x = x
+        self.center_y = y
+        self.width = width
+        self.height = 10
+        self.color = arcade.color.BLACK
+
+    def draw(self):
+        arcade.draw_rectangle_filled(self.center_x, self.center_y, self.width, self.height, self.color)
+
+    def break_down(self, fall):
+        return -9999
+
+    def update(self, _):
+        pass
 
 
 class DoodleJump(arcade.Window):
@@ -147,14 +211,14 @@ class DoodleJump(arcade.Window):
             return
 
         self.player.update()
+        self.platforms.update()
 
         # Проверка столкновения с платформами (только при падении)
-        if self.player.velocity_y < 0:
-            platform_hit = arcade.check_for_collision_with_list(self.player, self.platforms)
-            if platform_hit:
-                for platform in platform_hit:
-                    self.player.velocity_y = platform.break_down()
-                    print(self.player.velocity_y)
+        platform_hit = arcade.check_for_collision_with_list(self.player, self.platforms)
+        if platform_hit:
+            for platform in platform_hit:
+                self.player.velocity_y = platform.break_down(self.player.velocity_y)
+                print(self.player.velocity_y)
 
         # Движение камеры вверх
         if self.player.center_y > SCREEN_HEIGHT // 2 + self.camera_y:
@@ -164,18 +228,25 @@ class DoodleJump(arcade.Window):
 
         # Добавление новых платформ
         highest_platform = max(self.platforms, key=lambda p: p.center_y)
+        high_of_jump = (JUMP_SPEED / GRAVITY) * JUMP_SPEED / 2
         while highest_platform.center_y < self.camera_y + SCREEN_HEIGHT + 100:
             x = random.randint(50, SCREEN_WIDTH - 50)
-            high_of_jump = (JUMP_SPEED / GRAVITY) * JUMP_SPEED / 2
-            y = highest_platform.center_y + min((high_of_jump,self.score / 10 + 60))
+            y = highest_platform.center_y + min((high_of_jump, self.score / 10 + 60))
             rr = random.random()
-            if rr < 0.1:
+            if rr < 0.05:
                 platform = PlatformJump(x, y)
+            elif rr < 0.2:
+                platform = PlatformMove(x, y)
             elif rr < self.score / 2000:
-                platform = Platform_Disappearance(x, y)
+                platform = PlatformDisappearance(x, y)
             else:
                 platform = Platform(x, y)
             self.platforms.append(platform)
+            if random.random() < 0.02:
+                x = random.randint(50, SCREEN_WIDTH - 50)
+                y = highest_platform.center_y + min((high_of_jump, self.score / 10 + 60))
+                platform = PlatformDied(x, y)
+                self.platforms.append(platform)
             highest_platform = platform
 
         # Удаление платформ за экраном
