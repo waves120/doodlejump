@@ -53,7 +53,7 @@ class DoodleJump(arcade.Window):
             arcade.draw_text("ИГРА НАЧАЛАСЬ", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
                              arcade.color.GREEN, 30, anchor_x="center", bold=True)
             arcade.draw_text("Нажмите R для старта", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40,
-                             arcade.color.WHITE, 16, anchor_x="center")
+                             arcade.color.BLUE, 16, anchor_x="center")
         else:
 
             # Рисуем платформы и игрока
@@ -70,7 +70,7 @@ class DoodleJump(arcade.Window):
             arcade.draw_text("ИГРА ОКОНЧЕНА", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
                              arcade.color.RED, 30, anchor_x="center", bold=True)
             arcade.draw_text("Нажмите R для перезапуска", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40,
-                             arcade.color.WHITE, 16, anchor_x="center")
+                             arcade.color.BLUE, 16, anchor_x="center")
 
     def on_update(self, delta_time):
         if self.game_over or self.game_start:
@@ -141,3 +141,4 @@ class DoodleJump(arcade.Window):
     def on_key_release(self, key, modifiers):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player.velocity_x = 0
+
