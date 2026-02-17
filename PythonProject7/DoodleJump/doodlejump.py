@@ -18,7 +18,6 @@ class DoodleJump(arcade.Window):
         self.game_start = True
         self.game_over = False
         self.camera_y = 0
-        self.background_texture = arcade.load_texture("img/2.jpg", )
 
     def setup(self):
         self.player = Player()
@@ -45,17 +44,16 @@ class DoodleJump(arcade.Window):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_texture_rect(self.background_texture,
-                                 arcade.rect.LRBT(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT))
 
         # Используем игровую камеру
         self.camera.use()
         self.camera.position = arcade.math.lerp_2d(self.camera.position, (200, self.camera_y + 300), 0.15)
+
         if self.game_start:
             arcade.draw_text("ИГРА НАЧАЛАСЬ", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
                              arcade.color.GREEN, 30, anchor_x="center", bold=True)
             arcade.draw_text("Нажмите R для старта", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40,
-                             arcade.color.WHITE, 16, anchor_x="center")
+                             arcade.color.BLUE, 16, anchor_x="center")
         else:
 
             # Рисуем платформы и игрока
@@ -72,15 +70,13 @@ class DoodleJump(arcade.Window):
             arcade.draw_text("ИГРА ОКОНЧЕНА", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
                              arcade.color.RED, 30, anchor_x="center", bold=True)
             arcade.draw_text("Нажмите R для перезапуска", SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40,
-                             arcade.color.WHITE, 16, anchor_x="center")
-
-
+                             arcade.color.BLUE, 16, anchor_x="center")
 
     def on_update(self, delta_time):
         if self.game_over or self.game_start:
             return
 
-        # self.player.update()
+        #self.player.update()
         self.platforms.update()
 
         # Проверка столкновения с платформами (только при падении)
@@ -88,7 +84,7 @@ class DoodleJump(arcade.Window):
         if platform_hit:
             for platform in platform_hit:
                 self.player.velocity_y = platform.break_down(self.player.velocity_y)
-                # print(self.player.velocity_y)
+                #print(self.player.velocity_y)
 
         # Движение камеры вверх
         if self.player.center_y > SCREEN_HEIGHT // 2 + self.camera_y:
@@ -98,7 +94,7 @@ class DoodleJump(arcade.Window):
 
         # Добавление новых платформ
         highest_platform = max(self.platforms, key=lambda p: p.center_y)
-        high_of_jump = (JUMP_SPEED / GRAVITY) * JUMP_SPEED / 4
+        high_of_jump = (JUMP_SPEED / GRAVITY) * JUMP_SPEED / 2
         while highest_platform.center_y < self.camera_y + SCREEN_HEIGHT + 100:
             x = random.randint(50, SCREEN_WIDTH - 50)
             y = highest_platform.center_y + min((high_of_jump, self.score / 10 + 60))
@@ -145,3 +141,4 @@ class DoodleJump(arcade.Window):
     def on_key_release(self, key, modifiers):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player.velocity_x = 0
+
